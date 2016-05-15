@@ -80,7 +80,7 @@ func (p *Process) Save() error {
 }
 
 func (p *Process) Capture() {
-    cmd := exec.Command(os.Args[1], os.Args[2:]...)
+    cmd := exec.Command(p.Command[0], p.Command[1:]...)
     var stdout bytes.Buffer
     var stderr bytes.Buffer
     cmd.Stdout = &stdout
@@ -100,6 +100,7 @@ func (p *Process) Capture() {
     if err != nil {
         fmt.Println(err.Error())
     }
+    p.Playback()
 }
 
 func (p *Process) Lookup() error {
@@ -110,9 +111,12 @@ func (p *Process) Lookup() error {
     defer db.Close()
     err = db.View(func(tx *bolt.Tx) error {
         b := tx.Bucket([]byte("processes"))
+        if b == nil {
+            return fmt.Errorf("Nothing has been recorded yet. Try to capture some commands first")
+        }
         v := b.Get(p.Key())
         if v == nil {
-            return fmt.Errorf("%s does not know this process. Run the command in capture mode first.", os.Args[0])
+            return fmt.Errorf("%s does not know about this process. Run the command in capture mode first.", os.Args[0])
         }
         p.FromJson(v)
         return nil
@@ -127,17 +131,66 @@ func (p *Process) Playback() error {
     return nil
 }
 
+func Export() error {
+    db, err := bolt.Open("processes.db", 0600, nil)
+    if err != nil {
+        return err
+    }
+    defer db.Close()
+    payload := []ProcessJson{}
+    db.View(func(tx *bolt.Tx) error {
+        b := tx.Bucket([]byte("processes"))
+        if b == nil {
+            return nil
+        }
+        b.ForEach(func(k, v []byte) error {
+            p := ProcessJson{}
+            json.Unmarshal(v, &p)
+            payload = append(payload, p)
+            return nil
+        })
+        return nil
+    })
+    data, _ := json.Marshal(payload)
+    os.Stdout.Write(data)
+    return nil
+}
+
+func Usage() {
+    fmt.Println(os.Args[0] + " [OPTS] [COMMAND] [[ARGS]]")
+    fmt.Println("")
+    fmt.Println(os.Args[0] + " can either capture or playback commands:")
+    fmt.Println("")
+    fmt.Println("Example:")
+    fmt.Println("")
+    fmt.Println("   $ " + os.Args[0] + " --capture ls -al /")
+    fmt.Println("   $ " + os.Args[0] + " ls -al /")
+    fmt.Println("")
+    fmt.Println("Options:")
+    fmt.Println("")
+    fmt.Println("  --export                          Export database to json")
+    fmt.Println("  --capture [COMMAND] [[ARGS]]      Capture the output of running COMMAND [ARGS]")
+}
+
 func InCaptureMode() bool {
     return os.Getenv("CAPTURE") == "1"
 }
 
 func main() {
-    p := Process{}
-    p.Command = os.Args[1:]
-    if InCaptureMode() {
+    if len(os.Args) == 1 {
+        Usage()
+    } else if os.Args[1] == "--export" {
+        Export()
+    } else if os.Args[1] == "--capture" {
+        p := Process{}
+        p.Command = os.Args[2:]
         p.Capture()
     } else {
-        if err := p.Lookup() ; err == nil {
+        p := Process{}
+        p.Command = os.Args[1:]
+        if InCaptureMode() {
+            p.Capture()
+        } else if err := p.Lookup() ; err == nil {
             p.Playback()
         } else {
             fmt.Println(err.Error())
