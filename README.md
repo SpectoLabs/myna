@@ -1,9 +1,9 @@
 processfly
 ==========
 
-*Process virtualization for the people*
+*"Process virtualization for the people by the people with people." - People*
 
-Processfly is a testing tool that captures the output of command line programs.
+Processfly is a testing tool that captures and replays the output of command line programs.
 It's heavily inspired by [SpectoLab's Hoverfly](https://github.com/SpectoLabs/hoverfly), 
 which does capture and playback for http(s) web services.
 
