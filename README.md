@@ -2,40 +2,39 @@ processfly
 ==========
 
 Processfly is a testing tool that captures the output of command line programs.
-It's heavily inspired by SpectoLab's Hoverfly, which does capture and playback
-for http(s) web services.
+It's heavily inspired by [SpectoLab's Hoverfly](https://github.com/SpectoLabs/hoverfly), 
+which does capture and playback for http(s) web services.
 
 Processfly is written in Go and makes use of Boltdb for storage.  It was
-initially built to facilitate testing of the KubeFuse program. It does not 
-work with interactive programs at this point in time, but it's pretty baller
-with the rest.
+initially built to facilitate testing of [KubeFuse](https://github.com/bspaans/kubefuse). 
+It does not work with interactive programs at this point in time, but it's
+pretty baller with the rest :sparkles:
 
 
-Usage
-=====
+## Usage
 
 Capture the output of `ls -al /`
 
-```
+```sh
 processfly --capture ls -al /
 ```
 
 Or by setting the CAPTURE environment variable:
 
-```
+```sh
 CAPTURE=1 processfly ls -al /
 ```
 
 Play back the output of `ls -al /`
 
-```
+```sh
 processfly ls -al /
 ```
 
 By writing a wrapper `ls` file and putting this on the PATH we can seamlessly
 use processfly from our tests:
 
-```
+```sh
 cat > ls <<EOF 
 #!/bin/bash 
 processfly "\$0" "\$@"
@@ -47,10 +46,10 @@ export PATH="`pwd`:$PATH"
 
 
 We can also specify a cheeky little alias to work with processfly from the
-command line, which is less useful for automated testing, but still fun for the
-whole family.
+command line, which is less useful for automated testing, but still provides
+fun for the whole family :family:
 
-```
+```sh
 $ alias ls="processfly ls"
 $ ls /
 ./processfly does not know this process. Run the command in capture mode first.
@@ -117,8 +116,8 @@ lrwxrwxrwx   1 root root        29 Apr  6 18:58 vmlinuz.old -> boot/vmlinuz-4.2.
 ```
 
 
-Workflow
-========
+## Workflow
+
 
 For KubeFuse I have to generate more than one test case.  To keep this process
 repeatable I added a `capture` step to my build system that I would run
@@ -126,7 +125,7 @@ whenever the command under test (`kubectl` in this case) was updated.
 
 The build step looks something like this:
 
-```
+```sh
 #!/bin/bash 
 
 # Put processfly into capture mode 
@@ -149,7 +148,7 @@ processfly --export | python -m json.tool > kubectl.json
 Before I start running my tests I need to create the kubectl shim and import
 the definition:
 
-```
+```sh
 cat > bin/kubectl <<EOF 
 #!/bin/bash 
 
@@ -162,9 +161,9 @@ processfly --import kubectl.json
 ```
 
 And then I can start my tests with a modified PATH so that the tests pick 
-up the shim first.
+up the shim first:
 
-```
+```sh
 PATH="bin/:$PATH" nosetests
 ```
 
