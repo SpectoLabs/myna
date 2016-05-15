@@ -159,6 +159,7 @@ processfly kubectl "\$@"
 EOF
 
 chmod +x bin/kubectl
+rm processes.db
 processfly --import kubectl.json
 ```
 
