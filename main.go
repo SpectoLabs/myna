@@ -127,13 +127,20 @@ func (p *Process) Playback() error {
     return nil
 }
 
+func InCaptureMode() bool {
+    return os.Getenv("CAPTURE") == "1"
+}
+
 func main() {
     p := Process{}
     p.Command = os.Args[1:]
-    p.Capture()
-    if err := p.Lookup() ; err == nil {
-        p.Playback()
+    if InCaptureMode() {
+        p.Capture()
     } else {
-        fmt.Println(err.Error())
+        if err := p.Lookup() ; err == nil {
+            p.Playback()
+        } else {
+            fmt.Println(err.Error())
+        }
     }
 }
