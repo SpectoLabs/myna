@@ -4,6 +4,7 @@ import (
     "fmt"
     "os"
     "os/exec"
+    "io/ioutil"
     "bytes"
     "syscall"
     "strings"
@@ -44,12 +45,17 @@ func (p *Process) Json() []byte {
     return result
 }
 
+func (p *Process) FromProcessJson(proc *ProcessJson) {
+    p.Command = proc.Command
+    p.Stdout = decodeBase64(proc.Stdout)
+    p.Stderr = decodeBase64(proc.Stderr)
+    p.ReturnCode = proc.ReturnCode
+}
+
 func (p *Process) FromJson(payload []byte) {
     result := ProcessJson{}
     json.Unmarshal(payload, &result)
-    p.Stdout = decodeBase64(result.Stdout)
-    p.Stderr = decodeBase64(result.Stderr)
-    p.ReturnCode = result.ReturnCode
+    p.FromProcessJson(&result)
 }
 
 func (p *Process) Key() []byte {
@@ -156,6 +162,25 @@ func Export() error {
     return nil
 }
 
+func Import(file string) {
+    payload, err := ioutil.ReadFile(file)
+    if err != nil {
+        fmt.Println(err.Error())
+        return
+    }
+    parsed := []ProcessJson{}
+    err = json.Unmarshal(payload, &parsed)
+    if err != nil {
+        fmt.Println(err.Error())
+        return
+    }
+    for _, j := range parsed {
+        p := Process{}
+        p.FromProcessJson(&j)
+        p.Save()
+    }
+}
+
 func Usage() {
     fmt.Println(os.Args[0] + " [OPTS] [COMMAND] [[ARGS]]")
     fmt.Println("")
@@ -169,6 +194,7 @@ func Usage() {
     fmt.Println("Options:")
     fmt.Println("")
     fmt.Println("  --export                          Export database to json")
+    fmt.Println("  --import [PATH]                   Import json to database")
     fmt.Println("  --capture [COMMAND] [[ARGS]]      Capture the output of running COMMAND [ARGS]")
 }
 
@@ -181,6 +207,8 @@ func main() {
         Usage()
     } else if os.Args[1] == "--export" {
         Export()
+    } else if os.Args[1] == "--import" {
+        Import(os.Args[2])
     } else if os.Args[1] == "--capture" {
         p := Process{}
         p.Command = os.Args[2:]
