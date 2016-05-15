@@ -31,8 +31,10 @@ Play back the output of `ls -al /`
 processfly ls -al /
 ```
 
-By writing a wrapper `ls` file and putting this on the PATH we can seamlessly
-use processfly from our tests:
+And that's the gist of it. We can update our tests to use processfly in place
+of the usual binary, but by writing a wrapper `ls` file and putting this on the
+PATH we can seamlessly use processfly from our tests without having to change 
+a single thing:
 
 ```sh
 cat > ls <<EOF 
@@ -46,8 +48,8 @@ export PATH="`pwd`:$PATH"
 
 
 We can also specify a cheeky little alias to work with processfly from the
-command line, which is less useful for automated testing, but still provides
-fun for the whole family :family:
+command line, which is less useful for automated testing, but still manages to
+provide fun for the whole family :family:
 
 ```sh
 $ alias ls="processfly ls"
