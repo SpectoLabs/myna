@@ -124,9 +124,10 @@ lrwxrwxrwx   1 root root        29 Apr  6 18:58 vmlinuz.old -> boot/vmlinuz-4.2.
 ## Workflow
 
 
-For KubeFuse I have to generate more than one test case.  To keep this process
-repeatable I added a `capture` step to my build system that I would run
-whenever the command under test (`kubectl` in this case) was updated.
+For [KubeFuse](https://github.com/bspaans/kubefuse) I have to generate more
+than one test case.  To keep this process repeatable I added a `capture` step
+to my build system that I would run whenever the command under test (`kubectl`
+in this case) was updated.
 
 The build step looks something like this:
 
