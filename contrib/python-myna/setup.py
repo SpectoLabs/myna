@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = "myna",
-    version = "1.0.0",
+    name = "python-myna",
+    version = "1.0.1",
     packages = find_packages(),
     author = "SpectoLabs",
     author_email = "admin@specto.io",

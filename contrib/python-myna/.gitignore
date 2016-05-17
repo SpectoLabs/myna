@@ -1,4 +1,4 @@
 *.pyc
 dist/
 build/
-myna.egg-info/
+python_myna.egg-info/
