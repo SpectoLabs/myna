@@ -1,13 +1,13 @@
-processfly
+myna
 ==========
 
 *"Process virtualization for the people by the people with people." - People*
 
-Processfly is a testing tool that captures and replays the output of command line programs.
+Myna is a testing tool that captures and replays the output of command line programs.
 It's heavily inspired by [SpectoLab's Hoverfly](https://github.com/SpectoLabs/hoverfly), 
 which does capture and playback for http(s) web services.
 
-Processfly is written in Go and makes use of Boltdb for storage.  It was
+Myna is written in Go and makes use of Boltdb for storage.  It was
 initially built to facilitate testing of [KubeFuse](https://github.com/bspaans/kubefuse). 
 
 It does not work with interactive programs at this point in time, but it's
@@ -19,30 +19,30 @@ pretty baller with the rest :sparkles:
 Capture the output of `ls -al /`
 
 ```sh
-processfly --capture ls -al /
+myna --capture ls -al /
 ```
 
 Or by setting the CAPTURE environment variable:
 
 ```sh
-CAPTURE=1 processfly ls -al /
+CAPTURE=1 myna ls -al /
 ```
 
 Play back the output of `ls -al /`
 
 ```sh
-processfly ls -al /
+myna ls -al /
 ```
 
-And that's the gist of it. We can update our tests to use processfly in place
+And that's the gist of it. We can update our tests to use myna in place
 of the usual binary, but by writing a wrapper `ls` file and putting this on the
-PATH we can seamlessly use processfly from our tests without having to change 
+PATH we can seamlessly use myna from our tests without having to change 
 a single thing:
 
 ```sh
 cat > ls <<EOF 
 #!/bin/bash 
-processfly "\$0" "\$@"
+myna "\$0" "\$@"
 EOF
 
 chmod +x ls  
@@ -50,14 +50,14 @@ export PATH="`pwd`:$PATH"
 ```
 
 
-We can also specify a cheeky little alias to work with processfly from the
+We can also specify a cheeky little alias to work with myna from the
 command line, which is less useful for automated testing, but still manages to
 provide fun for the whole family :family:
 
 ```sh
-$ alias ls="processfly ls"
+$ alias ls="myna ls"
 $ ls /
-./processfly does not know this process. Run the command in capture mode first.
+./myna does not know this process. Run the command in capture mode first.
 $ export CAPTURE=1
 $ ls /
 drwxr-xr-x  24 root root      4096 May 14 12:29 .
@@ -134,21 +134,21 @@ The build step looks something like this:
 ```sh
 #!/bin/bash 
 
-# Put processfly into capture mode 
+# Put myna into capture mode 
 export CAPTURE=1
 
-# Remove the old processfly database if it exists
+# Remove the old myna database if it exists
 rm -f processes.db
 
 # Run the commands I need for testing:
-processfly kubectl get namespaces
-processfly kubectl get pods --all-namespaces
-processfly kubectl get svc --all-namespaces
-processfly kubectl get rc --all-namespaces
+myna kubectl get namespaces
+myna kubectl get pods --all-namespaces
+myna kubectl get svc --all-namespaces
+myna kubectl get rc --all-namespaces
 ....
 
 # Export the results
-processfly --export | python -m json.tool > kubectl.json
+myna --export | python -m json.tool > kubectl.json
 ```
 
 Before I start running my tests I need to create the kubectl shim and import
@@ -159,12 +159,12 @@ cat > bin/kubectl <<EOF
 #!/bin/bash 
 
 unset CAPTURE
-processfly kubectl "\$@"
+myna kubectl "\$@"
 EOF
 
 chmod +x bin/kubectl
 rm processes.db
-processfly --import kubectl.json
+myna --import kubectl.json
 ```
 
 And then I can start my tests with a modified PATH so that the tests pick 
