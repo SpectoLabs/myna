@@ -1,0 +1,4 @@
+*.pyc
+dist/
+build/
+myna.egg-info/
