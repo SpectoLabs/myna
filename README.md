@@ -12,6 +12,17 @@ initially built to facilitate testing of [KubeFuse](https://github.com/bspaans/k
 It does not work with interactive programs at this point in time, but it's
 pretty baller with the rest :sparkles:
 
+## Installation
+
+Myna uses the Glide build tool so you can just do:
+
+```
+glide install 
+go build
+```
+
+And you're laughing.
+
 
 ## Usage
 
