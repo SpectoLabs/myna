@@ -1,5 +1,4 @@
-myna
-==========
+# myna
 
 *"Process virtualization for the people by the people with people." - People*
 
@@ -49,6 +48,7 @@ chmod +x ls
 export PATH="`pwd`:$PATH"
 ```
 
+## Usage from the Shell
 
 We can also specify a cheeky little alias to work with myna from the
 command line, which is less useful for automated testing, but still manages to
@@ -121,7 +121,7 @@ lrwxrwxrwx   1 root root        29 Apr  6 18:58 vmlinuz.old -> boot/vmlinuz-4.2.
 ```
 
 
-## Workflow
+## A Continuous Integration Workflow
 
 
 For [KubeFuse](https://github.com/bspaans/kubefuse) I have to generate more
@@ -175,3 +175,11 @@ PATH="bin/:$PATH" nosetests
 ```
 
 And that's it. Your uncle is Bob.
+
+
+## License
+
+Apache License version 2.0 [See LICENSE for details](./blob/master/LICENSE).
+
+(c) [SpectoLabs](https://specto.io) 2016.
+
