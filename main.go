@@ -34,6 +34,13 @@ func decodeBase64(str string) []byte {
     data, _ := base64.StdEncoding.DecodeString(str)
     return data
 }
+func openBoltDb() (*bolt.DB, error) {
+    location := os.Getenv("DATABASE_LOCATION")
+    if location == "" {
+        location = "processes.db"
+    }
+    return bolt.Open(location, 0600, nil)
+}
 
 func (p *Process) Json() []byte {
     payload := ProcessJson{}
@@ -70,7 +77,7 @@ func (p *Process) Print() {
 }
 
 func (p *Process) Save() error {
-    db, err := bolt.Open("processes.db", 0600, nil)
+    db, err := openBoltDb();
     if err != nil {
         return err
     }
@@ -110,7 +117,7 @@ func (p *Process) Capture() {
 }
 
 func (p *Process) Lookup() error {
-    db, err := bolt.Open("processes.db", 0600, nil)
+    db, err := openBoltDb();
     if err != nil {
         return err
     }
@@ -138,7 +145,7 @@ func (p *Process) Playback() error {
 }
 
 func Export() error {
-    db, err := bolt.Open("processes.db", 0600, nil)
+    db, err := openBoltDb();
     if err != nil {
         return err
     }
