@@ -6,7 +6,7 @@ TEMPLATE = """
 #!/bin/bash -e
 
 unset CAPTURE
-myna {application} "\$@"
+myna {application} "$@"
 """
 
 def _add_shim_directory_to_path(shim_dir):

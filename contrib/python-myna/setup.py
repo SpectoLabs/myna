@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "python-myna",
-    version = "1.0.1",
+    version = "1.0.2",
     packages = find_packages(),
     author = "SpectoLabs",
     author_email = "admin@specto.io",
