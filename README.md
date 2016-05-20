@@ -229,6 +229,19 @@ library, so my `__init__.py` looks like this:
 from myna import *
 ```
 
+The only thing that is missing now is to create and then later import the 
+simulations. This is similar to the steps describe above, and something 
+for which I use Make, because I love Make and Make is awesome. 
+
+```make
+myna:
+	./kubectl.myna.sh
+
+test:
+	DATABASE_LOCATION="`pwd`/kubectl.db" myna --import tests/kubectl.json
+	DATABASE_LOCATION="`pwd`/kubectl.db" nosetests
+```
+
 
 ## License
 
