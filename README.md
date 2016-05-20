@@ -44,10 +44,19 @@ Play back the output of `ls -al /`
 myna ls -al /
 ```
 
-And that's the gist of it. We can update our tests to use myna in place
-of the usual binary, but by writing a wrapper `ls` file and putting this on the
-PATH we can seamlessly use myna from our tests without having to change 
-a single thing:
+By default myna will save all its state in a file called `processes.db`, 
+but we can override that by setting the `DATABASE_LOCATION` environment 
+variable:
+
+```sh
+DATABASE_LOCATION=/tmp/my.db myna --capture ls -al /
+DATABASE_LOCATION=/tmp/my.db myna ls -al /
+```
+
+To use the simulated process from our tests we can update our code to use myna
+in place of the usual binary, but by writing a wrapper `ls` file and putting
+this on the PATH we can seamlessly use myna from our tests without having to
+change a single thing:
 
 ```sh
 cat > ls <<EOF 
@@ -186,6 +195,39 @@ PATH="bin/:$PATH" nosetests
 ```
 
 And that's it. Your uncle is Bob.
+
+
+## Using Myna in your Python Unit Tests
+
+I actually kind of lied in the previous section, because since the release 
+of `python-myna` (see the `contrib/python-myna/` directory) I don't have to 
+write any shims or modify my path, because I let this library take care of it 
+for me.
+
+For this example I'm using `nose` and `python-myna`, which you can both install 
+using pip.
+
+The KubeFuse repository is roughly structured like this:
+
+```
+kubefuse/kubefuse.py
+kubefuse/all_the_rest.py
+tests/test_kubefuse.py
+tests/test_all_the_rest.py
+tests/__init__.py
+```
+
+The kubefuse directory contains all the source code and the tests directory the 
+tests. I run the suite by starting `nosetests` in the root.
+
+To make my tests work with Myna I use package level `setUp` and `tearDown` 
+functions that take care of handling the shim creation and PATH jumbling 
+for me. Luckily I can just import these functions straight from the `python-myna`
+library, so my `__init__.py` looks like this:
+
+```python
+from myna import *
+```
 
 
 ## License
