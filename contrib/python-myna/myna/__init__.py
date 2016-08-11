@@ -1,4 +1,4 @@
-import shim
+from . import shim
 
 tmpdir = None
 
